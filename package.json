@@ -1,0 +1,24 @@
+{
+  "name": "voiting-mvp",
+  "version": "1.0.0",
+  "description": "\"# voting-mvp\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mx-Tr/voting-mvp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mx-Tr/voting-mvp/issues"
+  },
+  "homepage": "https://github.com/Mx-Tr/voting-mvp#readme",
+  "dependencies": {
+    "googleapis": "^150.0.1"
+  }
+}
