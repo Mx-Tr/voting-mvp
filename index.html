@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MVP Голосование</title>
+    <style>
+        body { font-family: sans-serif; }
+        .participant { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .participant button { padding: 8px 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Список участников</h1>
+    <div id="participants-list">
+        <p>Загрузка...</p>
+    </div>
+
+    <script>
+        const participantsList = document.getElementById('participants-list');
+        // После развертывания на Vercel, здесь будет ваш URL
+        const API_BASE_URL = ''; // Например 'https://voting-mvp-rho.vercel.app'
+
+        // 1. Функция для получения и отрисовки участников
+        async function fetchAndRenderParticipants() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/participants`);
+                const participants = await response.json();
+
+                participantsList.innerHTML = ''; // Очищаем список
+
+                participants.forEach(p => {
+                    const participantDiv = document.createElement('div');
+                    participantDiv.className = 'participant';
+                    participantDiv.innerHTML = `
+                        <span>${p.name}</span>
+                        <strong>Голоса: <span id="votes-for-${p.id}">${p.votes}</span></strong>
+                        <button data-id="${p.id}">Голосовать</button>
+                    `;
+                    participantsList.appendChild(participantDiv);
+                });
+            } catch (error) {
+                participantsList.innerHTML = '<p>Не удалось загрузить участников.</p>';
+                console.error(error);
+            }
+        }
+
+        // 2. Функция для отправки голоса
+        async function handleVote(event) {
+            if (event.target.tagName !== 'BUTTON') return;
+
+            const button = event.target;
+            const id = button.dataset.id;
+            button.disabled = true; // Блокируем кнопку на время запроса
+            button.textContent = 'Голосуем...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при голосовании');
+                }
+
+                const result = await response.json();
+
+                // 3. Обновляем счетчик на странице без перезагрузки
+                const voteSpan = document.getElementById(`votes-for-${result.id}`);
+                if (voteSpan) {
+                    voteSpan.textContent = result.newVotes;
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Произошла ошибка. Попробуйте снова.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Голосовать';
+            }
+        }
+
+        // 4. Назначаем слушателя событий и запускаем загрузку
+        participantsList.addEventListener('click', handleVote);
+        fetchAndRenderParticipants();
+    </script>
+</body>
+</html>
