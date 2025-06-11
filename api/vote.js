@@ -1,6 +1,21 @@
 const { google } = require('googleapis');
 
 module.exports = async (req, res) => {
+
+  // --- НАЧАЛО БЛОКА ДЛЯ CORS ---
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*'); // В продакшене лучше указать конкретный домен
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  // --- КОНЕЦ БЛОКА ДЛЯ CORS ---
+
   // В реальном проекте здесь будет проверка на метод POST
   if (req.method !== 'POST') {
     return res.status(405).send({ error: 'Only POST requests allowed' });
